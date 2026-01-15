@@ -38,6 +38,8 @@ public class AnalyzeFileController {
 
         System.out.println("----------------开始处理文件-------------------");
 
+        String regex = "[^a-zA-Z\\u4e00-\\u9fa5]";
+
         List<Order> orderList = null;
         List<Record> recordList = null;
         MultiValueMap<String, String> diffMap = new LinkedMultiValueMap<>();
@@ -54,7 +56,7 @@ public class AnalyzeFileController {
                             Order order = new Order();
                             order.setColumn(Long.valueOf(i) + 2);
                             order.setPfmc(item.get("配方名称").toString());
-                            order.setWlmc(item.get("物料名称").toString());
+                            order.setWlmc(item.get("物料名称").toString().replaceAll(regex,""));
                             order.setClkssj(DateUtil.parse(item.get("出料开始时间").toString()));
                             return order;
                         })
@@ -64,7 +66,7 @@ public class AnalyzeFileController {
                         .mapToObj(i -> {
                             Map<String, Object> item = readAll.get(i);
                             Record record = new Record();
-                            record.setWlmc(item.get("效期名称").toString());
+                            record.setWlmc(item.get("效期名称").toString().replaceAll(regex,""));
                             record.setDysj(DateUtil.parse(item.get("打印时间").toString()));
                             record.setDqsj(DateUtil.parse(item.get("到期时间").toString()));
                             return record;
@@ -72,8 +74,8 @@ public class AnalyzeFileController {
                         .collect(Collectors.toList());
             } else {
                 readAll.stream().forEach(item-> {
-                    String key = item.get("出料物料名称").toString();
-                    String value = item.get("记录物料名称").toString();
+                    String key = item.get("出料物料名称").toString().replaceAll(regex,"");
+                    String value = item.get("记录物料名称").toString().replaceAll(regex,"");
                     diffMap.add(key, value);
                 });
             }
@@ -87,24 +89,26 @@ public class AnalyzeFileController {
         for (Order order: orderList) {
             Date wl_use_startTime = order.getClkssj();
             boolean isValid = false; // 标记该订单是否使用了有效物料
+            boolean materialExists = false; // 标记物料是否存在于物料表中
             for (Record record: recordList) {
                if (order.getWlmc().equals(record.getWlmc()) ||
                        ifDiff(diffMap, order.getWlmc(), record.getWlmc()))
                         {
-                   // 匹配对应物料
-                   Date wl_make_startTime = record.getDysj();
-                   Date wl_valid_endTime = record.getDqsj();
-                            // 检查使用时间是否在有效范围内：制作时间 <= 使用时间 <= 到期时间
-                    if (wl_use_startTime.after(wl_make_startTime) &&
-                            wl_use_startTime.before(wl_valid_endTime)) {
-                        // 如果物料在有效期内使用，则标记为有效，并跳出内层循环
-                        isValid = true;
-                        break;
+                            materialExists = true; // 找到了该物料
+                           // 匹配对应物料
+                           Date wl_make_startTime = record.getDysj();
+                           Date wl_valid_endTime = record.getDqsj();
+                                    // 检查使用时间是否在有效范围内：制作时间 <= 使用时间 <= 到期时间
+                            if (wl_use_startTime.after(wl_make_startTime) &&
+                                    wl_use_startTime.before(wl_valid_endTime)) {
+                                // 如果物料在有效期内使用，则标记为有效，并跳出内层循环
+                                isValid = true;
+                                break;
                     }
                }
             }
             // 只有当订单没有使用任何有效期内的物料时，才认为是使用了过期物料
-            if (!isValid) {
+            if (materialExists && !isValid) {
                 useValidOrders.add(order);
             }
         }
