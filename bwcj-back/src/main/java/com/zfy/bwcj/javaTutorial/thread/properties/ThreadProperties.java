@@ -29,6 +29,10 @@ class ThreadProperties {
         System.out.println(Thread.currentThread().getName() + ": ID: " + thread.getId());
         System.out.println(Thread.currentThread().getName() + ": 名称: " + thread.getName());
         System.out.println(Thread.currentThread().getName() + ": 状态: " + thread.getState());
+        //最低优先级1
+        //默认优先级是5
+        //最高优先级10  优先级比较高的获取CPU时间片可能会多一些。（但也不完全是，大概率是多的。）
+        thread.setPriority(1);
         System.out.println(Thread.currentThread().getName() + ": 优先级: " + thread.getPriority());
         System.out.println(Thread.currentThread().getName() + ": 后台线程: " + thread.isDaemon());
         System.out.println(Thread.currentThread().getName() + ": 活着: " + thread.isAlive());

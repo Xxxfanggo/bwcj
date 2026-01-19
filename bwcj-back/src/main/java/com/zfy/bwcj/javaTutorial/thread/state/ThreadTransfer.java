@@ -24,7 +24,8 @@ public class ThreadTransfer {
      *TERMINATED:工作完成了
      ****/
     public static void main(String[] args) {
-        transfer2();
+        joinThread();
+
     }
 
     //  NEW 、 RUNNABLE 、 TERMINATED 状态的转换
@@ -80,6 +81,45 @@ public class ThreadTransfer {
         System.out.println(t2.getName() + ": " + t2.getState()); // 此时 t2 肯定是 BLOCKED，因为 t1 持有锁
 
     }
+
+    /****
+     * static void yield()	让位方法，当前线程暂停，回到就绪状态，让给其它线程。
+     * void join()	将一个线程合并到当前线程中，当前线程受阻塞，加入的线程执行直到结束
+     */
+
+    public static void yieldThread() {
+        Thread t = new Thread(() -> {
+            for (int i = 0; i < 10000; i++) {
+                //每100个让位一次。
+                if (i % 100 == 0) {
+//                    Thread.yield(); // 当前线程暂停一下，让给主线程。  注意： 并不是每次都让成功的，有可能它又抢到时间片了。
+                }
+                System.out.println(Thread.currentThread().getName() + " ---> " + i);
+            }
+        }, "t");
+        t.start();
+        for(int i = 1; i <= 10000; i++) {
+            System.out.println(Thread.currentThread().getName() + "--->" + i);
+        }
+    }
+
+    public static void joinThread() {
+        System.out.println("main thread begin");
+        Thread joinThread = new Thread(() -> {
+            for (int i = 0; i < 100; i++) {
+                System.out.println(Thread.currentThread().getName() + " ---> " + i);
+            }
+        }, "joinThread");
+        joinThread.start();
+        try {
+            joinThread.join(); // 变同步 ，主线程阻塞joinThread线程执行完再执行
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("main thread over");
+    }
+
+
 
 
 }
