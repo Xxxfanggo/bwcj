@@ -12,6 +12,8 @@ package com.zfy.bwcj.javaTutorial.thread.createMethod;
 public class ImplRunnable implements Runnable{
     @Override
     public void run() {
-        System.out.println("实现方式创建线程");
+        for (int i = 0; i < 200; i++) {
+            System.out.println("实现方式创建线程");
+        }
     }
 }

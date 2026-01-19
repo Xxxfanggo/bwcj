@@ -14,7 +14,8 @@ public class RunThreadMain {
     public static void main(String[] args) {
         // 继承创建
         ExtendThread extendThread = new ExtendThread();
-        extendThread.run();
+//        extendThread.run();
+        extendThread.start();
         // 实现创建
         Thread implRunnable = new Thread(new ImplRunnable());
         implRunnable.start();

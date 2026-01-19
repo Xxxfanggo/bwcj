@@ -34,6 +34,8 @@ class ThreadProperties {
         //最高优先级10  优先级比较高的获取CPU时间片可能会多一些。（但也不完全是，大概率是多的。）
         thread.setPriority(1);
         System.out.println(Thread.currentThread().getName() + ": 优先级: " + thread.getPriority());
+        // 后台线程（守护线程， eg: 垃圾回收线程）
+        // void setDaemon(boolean on)	on为true表示把线程设置为守护线程
         System.out.println(Thread.currentThread().getName() + ": 后台线程: " + thread.isDaemon());
         System.out.println(Thread.currentThread().getName() + ": 活着: " + thread.isAlive());
         System.out.println(Thread.currentThread().getName() + ": 被中断: " + thread.isInterrupted());
