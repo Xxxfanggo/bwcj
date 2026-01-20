@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @创建时间: 2026-01-19 17:25
  * @版本号: V2.4.0
  */
-public class newFixedThreadPool {
+public class NewFixedThreadPool {
     public static final int SLEEP_GAP=1000;
     static class TargetTask implements Runnable{
         static AtomicInteger taskNo=new AtomicInteger(1);
@@ -42,11 +42,11 @@ public class newFixedThreadPool {
         ExecutorService pool= Executors.newFixedThreadPool(3);
         for(int i=0;i<3;i++)
         {
-            newFixedThreadPool.TargetTask t1 = new newFixedThreadPool.TargetTask();
+            NewFixedThreadPool.TargetTask t1 = new NewFixedThreadPool.TargetTask();
             t1.setExecuteMethod("execute");
             pool.execute(t1);
 
-            newFixedThreadPool.TargetTask t2 = new newFixedThreadPool.TargetTask();
+            NewFixedThreadPool.TargetTask t2 = new NewFixedThreadPool.TargetTask();
             t2.setExecuteMethod("submit");
             pool.submit(t2);
         }
