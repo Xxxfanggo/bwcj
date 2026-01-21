@@ -6,75 +6,97 @@ public class DeadlockExample2 {
     private static ReentrantLock lock1 = new ReentrantLock();
     private static ReentrantLock lock2 = new ReentrantLock();
     public static void main(String[] args) {
+        // 创建并启动线程1
         new Thread(() -> {
-            // 尝试获取锁1
+
+            // 尝试获取 lock1 锁
             boolean result1 = lock1.tryLock();
-            if (result1) {
+            if (result1){
                 try {
-                    // 成功获取锁1
-                    System.out.println("Thread 1:  acquired lock1");
-                    // mock some work
+                    // 成功获取 lock1 锁，输出提示信息
+                    System.out.println("线程1: 持有锁1...");
+
+                    // 模拟一些工作
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(500); // 休眠 500 毫秒
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
-                    System.out.println("Thread 1:  trying to acquire lock2");
-                    // 尝试获取锁2
+                    // 输出提示信息，表示线程1正在等待获取 lock2 锁
+                    System.out.println("线程1: 等待获取锁2...");
+
+                    // 尝试获取 lock2 锁
                     boolean result2 = lock2.tryLock();
-                    if (result2) {
+                    if(result2){
                         try {
                             // 成功获取 lock2 锁，输出提示信息
-                            System.out.println("Thread 1:  get two locks");
+                            System.out.println("线程1: 成功获取到两个锁。");
                         } finally {
-                            // 释放锁2
+                            // 确保最终释放 lock2 锁
                             lock2.unlock();
                         }
-                    } else {
-                        System.out.println("Thread 1:  failed to acquire lock2");
+                    }else {
+                        // 获取 lock2 失败，输出提示信息
+                        System.out.println("线程1: 未获取到锁2");
                     }
-                } finally {
+
+                }finally {
+                    // 确保最终释放 lock1 锁
                     lock1.unlock();
-                    System.out.println("Thread 1:  releasing lock1");
                 }
-            } else {
-                System.out.println("Thread 1:  failed to acquire lock1");
+            }else{
+                // 获取 lock1 失败，输出提示信息
+                System.out.println("线程1: 未获取到锁1");
             }
-        }).start();
+
+        }).start(); // 启动线程1
 
         // 创建并启动线程2
         new Thread(() -> {
-            // 尝试获取锁2
+
+            // 尝试获取 lock2 锁
             boolean result2 = lock2.tryLock();
-            if (result2) {
+
+            if(result2){
                 try {
-                    System.out.println("Thread 2: acquired lock2");
+                    // 成功获取 lock2 锁，输出提示信息
+                    System.out.println("线程2: 持有锁2...");
+
+                    // 模拟一些工作
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(500); // 休眠 500 毫秒
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
-                    System.out.println("Thread 2: trying to acquire lock1");
+                    // 输出提示信息，表示线程2正在等待获取 lock1 锁
+                    System.out.println("线程2: 等待获取锁1...");
 
+                    // 尝试获取 lock1 锁
                     boolean result1 = lock1.tryLock();
-                    if (result1) {
+                    if(result1){
                         try {
-                            System.out.println("Thread 2: get two locks");
+                            // 成功获取 lock1 锁，输出提示信息
+                            System.out.println("线程2: 成功获取到两个锁。");
                         } finally {
+                            // 确保最终释放 lock1 锁
                             lock1.unlock();
                         }
-                    } else {
-                        System.out.println("Thread 2: failed to acquire lock1");
+                    }else {
+                        // 获取 lock1 失败，输出提示信息
+                        System.out.println("线程2: 未获取到锁1");
                     }
-                } finally {
+                }finally {
+                    // 确保最终释放 lock2 锁
                     lock2.unlock();
-                    System.out.println("Thread 2: releasing lock2");
                 }
-            } else {
-                System.out.println("Thread 2: failed to acquire lock2");
+            }else{
+                // 获取 lock2 失败，输出提示信息
+                System.out.println("线程2: 未获取到锁2");
             }
-        }).start();
+
+        }).start(); // 启动线程2
+
     }
 }
